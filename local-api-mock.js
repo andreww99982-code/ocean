@@ -45,6 +45,9 @@
       return jsonResponse(tokenPayload());
     }
 
-    return jsonResponse({});
+    return jsonResponse(
+      { error: 'local-mock-missing-handler', path },
+      501,
+    );
   };
 })();
