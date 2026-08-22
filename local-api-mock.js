@@ -10,7 +10,7 @@
   const jsonResponse = (payload, status = 200) =>
     new Response(JSON.stringify(payload), {
       status,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
     });
 
   const tokenPayload = () => {

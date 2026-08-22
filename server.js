@@ -50,7 +50,13 @@ function serveFile(res, filePath) {
     if (ext === '.html') {
       let html = data.toString('utf8');
       if (!html.includes(LOCAL_MOCK_TAG)) {
-        html = html.replace('</head>', `    ${LOCAL_MOCK_TAG}\n  </head>`);
+        if (html.includes('</head>')) {
+          html = html.replace('</head>', `    ${LOCAL_MOCK_TAG}\n  </head>`);
+        } else if (html.includes('</body>')) {
+          html = html.replace('</body>', `    ${LOCAL_MOCK_TAG}\n  </body>`);
+        } else {
+          html += `\n${LOCAL_MOCK_TAG}\n`;
+        }
       }
       res.writeHead(200, { 'Content-Type': mime });
       res.end(html);
