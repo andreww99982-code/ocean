@@ -3,6 +3,7 @@
   const host = window.location.hostname;
   const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host === '::1';
   if (!isLocalHost) return;
+  console.warn('[local-api-mock] Mock API interception is active for localhost.');
 
   const originalFetch = window.fetch.bind(window);
 
