@@ -533,7 +533,7 @@ async function routeOrder(url, request) {
   // --- Purchases (webCookie-based) ---
   // GET /order/purchases/:wc
   m = matchPath(p, '/purchases/:wc');
-  if (m && !p.includes('/', p.indexOf(m.wc) + m.wc.length + 1)) {
+  if (m && !p.includes('/', p.indexOf(m.wc) + m.wc.length)) {
     if (request.method === 'GET') {
       const purch = store.purchases[m.wc] || makePurchase(m.wc);
       return json(purch);
@@ -595,7 +595,6 @@ async function routeOrder(url, request) {
 
 async function routeUser(url, request) {
   const p = url.pathname.replace(/^\/user/, '');
-  const qs = url.search;
 
   // OAuth token / login (credentials: frontend / 1234)
   if (p.includes('/oauth/token') || p.includes('/oauth/login')) {
@@ -698,8 +697,13 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (host === 'seat.clorian.com' || host === 'eu-test.oppwa.com' || host.endsWith('.oppwa.com')) {
+  if (host === 'seat.clorian.com') {
     event.respondWith(routeSeat());
+    return;
+  }
+
+  if (host.endsWith('.oppwa.com')) {
+    event.respondWith(json({ result: { code: '000.000.000', description: 'Transaction succeeded' }, id: 'MOCK-' + Date.now() }));
     return;
   }
 
