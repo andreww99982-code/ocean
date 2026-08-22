@@ -6,10 +6,15 @@
  * service worker activates) are answered with realistic mock data instead of
  * hitting services.clorian.com and getting a 404.
  *
- * Works on any origin (localhost, GitHub Pages, Netlify, etc.).
+ * Works on any origin (localhost, GitHub Pages, Netlify, static hosting, etc.).
+ * NOT intended for production use — do not deploy to the live ticketing site.
  */
 (() => {
   if (typeof window === 'undefined' || typeof window.fetch !== 'function') return;
+
+  // Safety guard: never intercept on the real Clorian-hosted production domains.
+  var hostname = window.location.hostname;
+  if (/(?:^|\.)clorian\.com$/.test(hostname)) return;
 
   /* ── helpers ─────────────────────────────────────────────────────────────── */
 
