@@ -52,28 +52,27 @@ function serveFile(res, filePath) {
 }
 
 const RESOLVED_ROOT = path.resolve(ROOT);
+const ROOT_INDEX    = path.join(RESOLVED_ROOT, 'index.html');
 
-function isSafe(resolved) {
-  return resolved === RESOLVED_ROOT ||
-    resolved.startsWith(RESOLVED_ROOT + path.sep);
+/**
+ * Sanitize a URL path into safe file-system segments.
+ * Removes empty segments, `.`, and `..` so the result can never escape ROOT.
+ */
+function sanitizeSegments(urlPath) {
+  let decoded;
+  try { decoded = decodeURIComponent(urlPath); } catch (_) { decoded = '/'; }
+  return decoded.split('/').filter(s => s && s !== '.' && s !== '..');
 }
 
 const server = http.createServer((req, res) => {
-  // Strip query string
-  let urlPath = req.url.split('?')[0].split('#')[0];
+  // Strip query string / fragment
+  const rawPath = req.url.split('?')[0].split('#')[0];
 
-  // Decode URI
-  try { urlPath = decodeURIComponent(urlPath); } catch (_) { urlPath = '/'; }
-
-  // Map "/" → "/index.html"
-  if (urlPath === '/') urlPath = '/index.html';
-
-  // Resolve and validate candidate to prevent directory traversal
-  const candidate = path.resolve(path.join(RESOLVED_ROOT, urlPath));
-
-  if (!isSafe(candidate)) {
-    res.writeHead(403); res.end('Forbidden'); return;
-  }
+  // Build a safe path from sanitized segments
+  const segments = sanitizeSegments(rawPath);
+  const candidate = segments.length > 0
+    ? path.join(RESOLVED_ROOT, ...segments)
+    : RESOLVED_ROOT;
 
   fs.stat(candidate, (err, stat) => {
     if (!err && stat.isFile()) {
@@ -83,19 +82,18 @@ const server = http.createServer((req, res) => {
 
     // SPA fallback: serve the closest index.html
     // e.g. /en/some-route → /en/index.html
-    const dir  = path.dirname(candidate);
-    const idx1 = path.resolve(path.join(dir, 'index.html'));
-    if (!isSafe(idx1)) {
-      serveFile(res, path.join(RESOLVED_ROOT, 'index.html'));
-      return;
-    }
+    const parentSegments = segments.slice(0, -1);
+    const idx1 = parentSegments.length > 0
+      ? path.join(RESOLVED_ROOT, ...parentSegments, 'index.html')
+      : ROOT_INDEX;
+
     fs.stat(idx1, (e2, s2) => {
       if (!e2 && s2.isFile()) {
         serveFile(res, idx1);
         return;
       }
       // Root fallback
-      serveFile(res, path.join(RESOLVED_ROOT, 'index.html'));
+      serveFile(res, ROOT_INDEX);
     });
   });
 });
