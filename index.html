@@ -30,6 +30,13 @@
     -->
     <title>Oceanário de Lisboa | Bilheteira Oficial</title>
       <script>window.__CLIENT_ID__ = 'OceanarioLisboa';</script>
+      <script>
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/sw-mock.js').catch(function(e) {
+            console.warn('SW registration failed', e);
+          });
+        }
+      </script>
     <script type="module" crossorigin src="/static/js/modulepreload-polyfill.B5Qt9EMX.chunk.js"></script>
     <script type="module" crossorigin src="/static/js/main.B6w2W1Hn.js"></script>
   </head>
