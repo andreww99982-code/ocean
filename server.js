@@ -19,6 +19,7 @@ const path = require('path');
 
 const PORT    = process.env.PORT || 3000;
 const ROOT    = __dirname;
+const LOCAL_MOCK_TAG = '<script src="/local-api-mock.js"></script>';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -46,6 +47,22 @@ function serveFile(res, filePath) {
       res.end('Not found');
       return;
     }
+    if (ext === '.html') {
+      let html = data.toString('utf8');
+      if (!html.includes(LOCAL_MOCK_TAG)) {
+        if (html.includes('</head>')) {
+          html = html.replace('</head>', `    ${LOCAL_MOCK_TAG}\n  </head>`);
+        } else if (html.includes('</body>')) {
+          html = html.replace('</body>', `    ${LOCAL_MOCK_TAG}\n  </body>`);
+        } else {
+          html += `\n${LOCAL_MOCK_TAG}\n`;
+        }
+      }
+      res.writeHead(200, { 'Content-Type': mime });
+      res.end(html);
+      return;
+    }
+
     res.writeHead(200, { 'Content-Type': mime });
     res.end(data);
   });
