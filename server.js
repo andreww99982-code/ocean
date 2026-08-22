@@ -51,21 +51,27 @@ function serveFile(res, filePath) {
   });
 }
 
+const RESOLVED_ROOT = path.resolve(ROOT);
+
+function isSafe(resolved) {
+  return resolved === RESOLVED_ROOT ||
+    resolved.startsWith(RESOLVED_ROOT + path.sep);
+}
+
 const server = http.createServer((req, res) => {
   // Strip query string
   let urlPath = req.url.split('?')[0].split('#')[0];
 
   // Decode URI
-  try { urlPath = decodeURIComponent(urlPath); } catch (_) {}
+  try { urlPath = decodeURIComponent(urlPath); } catch (_) { urlPath = '/'; }
 
   // Map "/" → "/index.html"
   if (urlPath === '/') urlPath = '/index.html';
 
-  const candidate = path.join(ROOT, urlPath);
+  // Resolve and validate candidate to prevent directory traversal
+  const candidate = path.resolve(path.join(RESOLVED_ROOT, urlPath));
 
-  // Security: prevent directory traversal
-  const resolvedRoot = path.resolve(ROOT) + path.sep;
-  if (!path.resolve(candidate).startsWith(resolvedRoot) && path.resolve(candidate) !== path.resolve(ROOT)) {
+  if (!isSafe(candidate)) {
     res.writeHead(403); res.end('Forbidden'); return;
   }
 
@@ -78,14 +84,18 @@ const server = http.createServer((req, res) => {
     // SPA fallback: serve the closest index.html
     // e.g. /en/some-route → /en/index.html
     const dir  = path.dirname(candidate);
-    const idx1 = path.join(dir, 'index.html');
+    const idx1 = path.resolve(path.join(dir, 'index.html'));
+    if (!isSafe(idx1)) {
+      serveFile(res, path.join(RESOLVED_ROOT, 'index.html'));
+      return;
+    }
     fs.stat(idx1, (e2, s2) => {
       if (!e2 && s2.isFile()) {
         serveFile(res, idx1);
         return;
       }
       // Root fallback
-      serveFile(res, path.join(ROOT, 'index.html'));
+      serveFile(res, path.join(RESOLVED_ROOT, 'index.html'));
     });
   });
 });
