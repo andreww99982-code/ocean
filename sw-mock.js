@@ -461,7 +461,10 @@ async function routeCatalog(url, request) {
 
   // Client language
   m = matchPath(p, '/clients/:cid/language');
-  if (m) return json([]);
+  if (m) return json([
+    { languageId: 1, defaultLanguage: true,  language: { languageCode: 'pt', name: 'Português'   } },
+    { languageId: 2, defaultLanguage: false, language: { languageCode: 'en', name: 'English'      } },
+  ]);
 
   // Client time slots
   m = matchPath(p, '/clients/:cid/timeSlots');
