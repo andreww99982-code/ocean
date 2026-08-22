@@ -1,0 +1,1 @@
+import{G as o,M as a}from"./index.De0w3nZx.chunk.js";import"./main.B6w2W1Hn.js";const i="theoceanariolisboafrontendoftomorrow";window.pos={id:3928,apiKey:i,name:"OceanarioLisboa",customGTM:["GTM-PCMZWJ5"],GTM:o,GAVersion:"GA4",logo:"https://cdn.clorian.com/logos/OceanarioLisboa.png"};a();

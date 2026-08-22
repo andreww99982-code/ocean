@@ -1,0 +1,13 @@
+{
+  "short_name": "Oceanario Lisboa",
+  "name": "Oceanario Lisboa",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
