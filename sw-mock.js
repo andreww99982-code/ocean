@@ -150,7 +150,7 @@ function routeCatalog(url) {
   if (path.match(/^\/catalog\/clients\/[^/]+\/configuration$/)) return json([]);
   if (path.match(/^\/catalog\/clients\/[^/]+\/language$/))      return json([]);
   if (path.match(/^\/catalog\/clients\//))                       return json([CLIENT]);
-  if (path.match(/^\/catalog\/salesGroups\/view\/loyalty/))      return json(null);
+  if (path.match(/^\/catalog\/salesGroups\/view\/loyalty/))      return json({});
   if (path.match(/^\/catalog\/salesGroups\/[^/]+\/product\/[^/]+\/calendar-info/)) return json({ calendarInfos: {} });
   if (path.match(/^\/catalog\/salesGroups\//))                   return json([SALES_GROUP]);
   if (path === '/catalog/products/configurations')               return json([]);
@@ -162,7 +162,7 @@ function routeCatalog(url) {
   if (path === '/catalog/analytics')                             return json({});
   if (path === '/catalog/regions')                               return json([]);
   if (path === '/catalog/vatNumberTypes/views/front-bill')       return json([]);
-  if (path === '/catalog/additionalSiteInfo/view/frontend')      return json(null);
+  if (path === '/catalog/additionalSiteInfo/view/frontend')      return json({});
   if (path.match(/^\/catalog\/services\/views\//))               return json([]);
   if (path === '/catalog/events/addons/available')               return json([]);
   if (path === '/catalog/buyerTypes/views/pricing')              return json(BUYER_TYPES);

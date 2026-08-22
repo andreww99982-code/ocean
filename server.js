@@ -64,7 +64,8 @@ const server = http.createServer((req, res) => {
   const candidate = path.join(ROOT, urlPath);
 
   // Security: prevent directory traversal
-  if (!candidate.startsWith(ROOT)) {
+  const resolvedRoot = path.resolve(ROOT) + path.sep;
+  if (!path.resolve(candidate).startsWith(resolvedRoot) && path.resolve(candidate) !== path.resolve(ROOT)) {
     res.writeHead(403); res.end('Forbidden'); return;
   }
 
