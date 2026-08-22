@@ -15,12 +15,12 @@
   const tokenPayload = () => {
     const now = Date.now();
     return {
-    access_token: `mock-access-token-${now}`,
-    refresh_token: `mock-refresh-token-${now}`,
-    token_type: 'bearer',
-    expires_in: 86400,
-    scope: 'read write',
-    jti: `mock-${now}`,
+      access_token: `mock-access-token-${now}`,
+      refresh_token: `mock-refresh-token-${now}`,
+      token_type: 'bearer',
+      expires_in: 86400,
+      scope: 'read write',
+      jti: `mock-${now}`,
     };
   };
 
@@ -41,7 +41,7 @@
     }
 
     const path = url.pathname;
-    if (path.includes('/oauth/token') || path.includes('/oauth/login')) {
+    if (/\/oauth\/(token|login)\/?$/.test(path)) {
       return jsonResponse(tokenPayload());
     }
 
