@@ -1,15 +1,15 @@
 (() => {
   if (typeof window === 'undefined' || typeof window.fetch !== 'function') return;
+  const host = window.location.hostname;
+  const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+  if (!isLocalHost) return;
 
   const originalFetch = window.fetch.bind(window);
 
   const jsonResponse = (payload, status = 200) =>
     new Response(JSON.stringify(payload), {
       status,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { 'Content-Type': 'application/json' },
     });
 
   const tokenPayload = () => ({
