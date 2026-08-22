@@ -10,10 +10,12 @@
 /* ─── Shared helpers ─────────────────────────────────────────────────────── */
 
 function uuid() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = (Math.random() * 16) | 0;
-    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
-  });
+  const bytes = new Uint8Array(16);
+  self.crypto.getRandomValues(bytes);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+  bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant
+  const h = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
 }
 
 function json(data, status = 200) {
@@ -679,7 +681,15 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (!host.endsWith('clorian.com')) return; // pass through non-clorian
+  const CLORIAN_HOSTS = new Set([
+    'services.clorian.com',
+    'cdn.clorian.com',
+    'seat.clorian.com',
+    'clorian.com',
+  ]);
+  const isClorian = CLORIAN_HOSTS.has(host) ||
+    (host.endsWith('.clorian.com') && /^[a-zA-Z0-9-]+\.clorian\.com$/.test(host));
+  if (!isClorian) return; // pass through non-clorian
 
   if (host === 'services.clorian.com') {
     const path = url.pathname;
